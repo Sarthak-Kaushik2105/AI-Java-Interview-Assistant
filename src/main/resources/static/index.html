@@ -1,0 +1,2195 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Java Interview Assistant</title>
+
+
+    <!-- Markdown -->
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+
+    <!-- Highlight.js -->
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github-dark.min.css">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/java.min.js"></script>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            color: #172033;
+        }
+
+
+        /* ================= HEADER ================= */
+
+        .header {
+
+            background: white;
+
+            padding: 24px 7%;
+
+            border-bottom: 1px solid #e5e7eb;
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            gap: 20px;
+        }
+
+
+        .header h1 {
+
+            margin: 0;
+
+            font-size: 32px;
+        }
+
+
+        .header p {
+
+            margin: 8px 0 0;
+
+            color: #667085;
+        }
+
+
+        .clear-btn {
+
+            border: none;
+
+            background: #dc2626;
+
+            color: white;
+
+            padding: 11px 18px;
+
+            border-radius: 8px;
+
+            cursor: pointer;
+        }
+
+
+        .clear-btn:hover {
+
+            background: #b91c1c;
+        }
+
+
+        /* ================= CONTAINER ================= */
+
+        .container {
+
+            width: 86%;
+
+            max-width: 1100px;
+
+            margin: 30px auto;
+        }
+
+
+        /* ================= OPTIONS ================= */
+
+        .options-box {
+
+            background: white;
+
+            padding: 22px;
+
+            border-radius: 14px;
+
+            margin-bottom: 20px;
+
+            box-shadow: 0 3px 15px rgba(0,0,0,0.06);
+        }
+
+
+        .options-title {
+
+            font-size: 18px;
+
+            font-weight: bold;
+
+            margin-bottom: 15px;
+        }
+
+
+        .options {
+
+            display: flex;
+
+            gap: 15px;
+
+            flex-wrap: wrap;
+        }
+
+
+        .option-group {
+
+            flex: 1;
+
+            min-width: 220px;
+        }
+
+
+        .option-group label {
+
+            display: block;
+
+            margin-bottom: 7px;
+
+            font-weight: bold;
+
+            font-size: 14px;
+        }
+
+
+        .option-group select {
+
+            width: 100%;
+
+            padding: 13px;
+
+            border: 1px solid #d0d5dd;
+
+            border-radius: 9px;
+
+            font-size: 15px;
+
+            background: white;
+
+            cursor: pointer;
+        }
+
+
+        /* ================= BUTTONS ================= */
+
+        .button-row {
+
+            display: flex;
+
+            gap: 10px;
+
+            margin-bottom: 25px;
+
+            flex-wrap: wrap;
+        }
+
+
+        .mock-btn {
+
+            flex: 1;
+
+            min-width: 220px;
+
+            padding: 16px;
+
+            border: none;
+
+            border-radius: 10px;
+
+            background: #7c3aed;
+
+            color: white;
+
+            font-size: 16px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+        }
+
+
+        .mock-btn:hover {
+
+            background: #6d28d9;
+        }
+
+
+        .stop-btn {
+
+            padding: 16px 22px;
+
+            border: none;
+
+            border-radius: 10px;
+
+            background: #dc2626;
+
+            color: white;
+
+            font-size: 16px;
+
+            cursor: pointer;
+
+            display: none;
+        }
+
+
+        /* ================= ASK ================= */
+
+        .ask-area {
+
+            display: flex;
+
+            gap: 10px;
+
+            margin-bottom: 30px;
+        }
+
+
+        .ask-area input {
+
+            flex: 1;
+
+            padding: 15px;
+
+            border: 1px solid #d0d5dd;
+
+            border-radius: 10px;
+
+            font-size: 16px;
+
+            outline: none;
+        }
+
+
+        .ask-area input:focus {
+
+            border-color: #2563eb;
+        }
+
+
+        .ask-area button {
+
+            padding: 15px 25px;
+
+            border: none;
+
+            border-radius: 10px;
+
+            background: #2563eb;
+
+            color: white;
+
+            font-size: 16px;
+
+            cursor: pointer;
+        }
+
+
+        .ask-area button:hover {
+
+            background: #1d4ed8;
+        }
+
+
+        /* ================= LOADING ================= */
+
+        .loading {
+
+            display: none;
+
+            background: white;
+
+            padding: 18px;
+
+            border-radius: 10px;
+
+            margin-bottom: 20px;
+
+            color: #667085;
+
+            font-weight: bold;
+        }
+
+
+        /* ================= MOCK INTERVIEW ================= */
+
+        .mock-panel {
+
+            display: none;
+
+            background: white;
+
+            border-radius: 16px;
+
+            padding: 25px;
+
+            margin-bottom: 30px;
+
+            box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+        }
+
+
+        .mock-title {
+
+            font-size: 24px;
+
+            font-weight: bold;
+
+            margin-bottom: 20px;
+        }
+
+
+        .mock-question {
+
+            background: #eaf2ff;
+
+            padding: 20px;
+
+            border-radius: 12px;
+
+            font-size: 19px;
+
+            font-weight: bold;
+
+            margin-bottom: 20px;
+        }
+
+
+        .mock-answer {
+
+            width: 100%;
+
+            min-height: 170px;
+
+            padding: 15px;
+
+            border: 1px solid #d0d5dd;
+
+            border-radius: 10px;
+
+            font-size: 16px;
+
+            font-family: Arial, sans-serif;
+
+            resize: vertical;
+
+            outline: none;
+        }
+
+
+        .mock-answer:focus {
+
+            border-color: #7c3aed;
+        }
+
+
+        .evaluate-btn {
+
+            margin-top: 15px;
+
+            padding: 14px 25px;
+
+            border: none;
+
+            border-radius: 10px;
+
+            background: #16a34a;
+
+            color: white;
+
+            font-size: 16px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+        }
+
+
+        .evaluate-btn:hover {
+
+            background: #15803d;
+        }
+
+
+        .evaluation {
+
+            display: none;
+
+            margin-top: 25px;
+
+            background: #f8fafc;
+
+            border-radius: 12px;
+
+            padding: 25px;
+
+            line-height: 1.7;
+        }
+
+
+        .next-btn {
+
+            margin-top: 20px;
+
+            padding: 14px 25px;
+
+            border: none;
+
+            border-radius: 10px;
+
+            background: #2563eb;
+
+            color: white;
+
+            font-size: 16px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+        }
+
+
+        .next-btn:hover {
+
+            background: #1d4ed8;
+        }
+
+
+        /* ================= HISTORY ================= */
+
+        .history-header {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            margin-bottom: 18px;
+        }
+
+
+        .history-header h2 {
+
+            margin: 0;
+        }
+
+
+        .history-count {
+
+            color: #667085;
+
+            font-size: 14px;
+        }
+
+
+        .question-card {
+
+            background: white;
+
+            border-radius: 14px;
+
+            margin-bottom: 18px;
+
+            box-shadow: 0 3px 15px rgba(0,0,0,0.06);
+
+            overflow: hidden;
+        }
+
+
+        .question-header {
+
+            background: #eaf2ff;
+
+            padding: 18px 20px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            cursor: pointer;
+
+            gap: 15px;
+        }
+
+
+        .question-header:hover {
+
+            background: #dfeaff;
+        }
+
+
+        .question-text {
+
+            font-weight: bold;
+
+            font-size: 17px;
+
+            flex: 1;
+        }
+
+
+        .question-meta {
+
+            font-size: 12px;
+
+            color: #667085;
+
+            margin-top: 6px;
+        }
+
+
+        .question-actions {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 8px;
+        }
+
+
+        .delete-btn {
+
+            border: none;
+
+            background: #fee2e2;
+
+            color: #b91c1c;
+
+            width: 34px;
+
+            height: 34px;
+
+            border-radius: 7px;
+
+            cursor: pointer;
+
+            font-size: 16px;
+        }
+
+
+        .arrow {
+
+            font-size: 18px;
+
+            width: 25px;
+
+            text-align: center;
+
+            transition: transform 0.2s;
+        }
+
+
+        .question-card.collapsed .arrow {
+
+            transform: rotate(-90deg);
+        }
+
+
+        .answer {
+
+            padding: 30px;
+
+            line-height: 1.7;
+
+            font-size: 16px;
+
+            color: #333;
+        }
+
+
+        .question-card.collapsed .answer {
+
+            display: none;
+        }
+
+
+        /* ================= MARKDOWN ================= */
+
+        .answer h1,
+        .answer h2,
+        .answer h3 {
+
+            margin-top: 28px;
+
+            color: #172033;
+        }
+
+
+        .answer ul,
+        .answer ol {
+
+            padding-left: 28px;
+        }
+
+
+        .answer li {
+
+            margin: 6px 0;
+        }
+
+
+        .answer code {
+
+            background: #eef2f7;
+
+            padding: 2px 6px;
+
+            border-radius: 5px;
+
+            font-family: Consolas, monospace;
+        }
+
+
+        .answer pre {
+
+            background: #1e1e1e;
+
+            color: #f8f8f2;
+
+            padding: 20px;
+
+            border-radius: 10px;
+
+            overflow-x: auto;
+
+            margin: 18px 0;
+        }
+
+
+        .answer pre code {
+
+            background: transparent;
+
+            padding: 0;
+
+            color: inherit;
+
+            font-size: 14px;
+
+            line-height: 1.6;
+        }
+
+
+        .code-wrapper {
+
+            position: relative;
+        }
+
+
+        .copy-btn {
+
+            position: absolute;
+
+            right: 10px;
+
+            top: 10px;
+
+            border: none;
+
+            background: white;
+
+            color: #222;
+
+            padding: 7px 12px;
+
+            border-radius: 6px;
+
+            cursor: pointer;
+
+            font-size: 13px;
+        }
+
+
+        /* ================= EMPTY ================= */
+
+        .empty-history {
+
+            background: white;
+
+            padding: 40px;
+
+            text-align: center;
+
+            border-radius: 14px;
+
+            color: #667085;
+        }
+
+
+        /* ================= MOBILE ================= */
+
+        @media (max-width: 700px) {
+
+            .header {
+
+                flex-direction: column;
+
+                align-items: flex-start;
+            }
+
+
+            .ask-area {
+
+                flex-direction: column;
+            }
+
+
+            .ask-area button {
+
+                width: 100%;
+            }
+
+
+            .question-header {
+
+                padding: 15px;
+            }
+
+
+            .answer {
+
+                padding: 20px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- =========================================================
+     HEADER
+========================================================= -->
+
+<header class="header">
+
+    <div>
+
+        <h1>🤖 Java Interview Assistant</h1>
+
+        <p>
+            AI-powered Java interview preparation assistant
+        </p>
+
+    </div>
+
+
+    <button
+            class="clear-btn"
+            onclick="clearHistory()">
+
+        🗑 Clear History
+
+    </button>
+
+</header>
+
+
+
+<main class="container">
+
+
+    <!-- =====================================================
+         SETTINGS
+    ====================================================== -->
+
+    <div class="options-box">
+
+        <div class="options-title">
+
+            🎯 Interview Settings
+
+        </div>
+
+
+        <div class="options">
+
+            <div class="option-group">
+
+                <label>
+
+                    Category
+
+                </label>
+
+
+                <select id="category">
+
+                    <option value="Core Java">
+                        ☕ Core Java
+                    </option>
+
+                    <option value="DSA">
+                        🧩 DSA
+                    </option>
+
+                    <option value="Spring Boot">
+                        🌱 Spring Boot
+                    </option>
+
+                    <option value="SQL">
+                        🗄️ SQL
+                    </option>
+
+                    <option value="OOP">
+                        🏗️ OOP
+                    </option>
+
+                    <option value="HR Interview">
+                        💼 HR Interview
+                    </option>
+
+                    <option value="Mixed Interview">
+                        🔥 Mixed Interview
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="option-group">
+
+                <label>
+
+                    Difficulty
+
+                </label>
+
+
+                <select id="difficulty">
+
+                    <option value="Easy">
+                        🟢 Easy
+                    </option>
+
+                    <option value="Medium" selected>
+                        🟡 Medium
+                    </option>
+
+                    <option value="Hard">
+                        🔴 Hard
+                    </option>
+
+                </select>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         MOCK INTERVIEW BUTTON
+    ====================================================== -->
+
+    <div class="button-row">
+
+        <button
+                class="mock-btn"
+                onclick="startMockInterview()">
+
+            🎤 Start Mock Interview
+
+        </button>
+
+
+        <button
+                id="stopMockBtn"
+                class="stop-btn"
+                onclick="stopMockInterview()">
+
+            ✕ Stop Interview
+
+        </button>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         MOCK INTERVIEW PANEL
+    ====================================================== -->
+
+    <div
+            class="mock-panel"
+            id="mockPanel">
+
+
+        <div class="mock-title">
+
+            🎤 Mock Interview
+
+        </div>
+
+
+        <div
+                class="mock-question"
+                id="mockQuestion">
+
+            Generating question...
+
+        </div>
+
+
+        <textarea
+                id="mockAnswer"
+                class="mock-answer"
+                placeholder="Type your answer here...">
+
+        </textarea>
+
+
+        <button
+                class="evaluate-btn"
+                onclick="evaluateMockAnswer()">
+
+            ✅ Submit Answer & Evaluate
+
+        </button>
+
+
+        <div
+                class="evaluation"
+                id="evaluation">
+
+        </div>
+
+
+        <button
+                class="next-btn"
+                id="nextQuestionBtn"
+                onclick="nextMockQuestion()"
+                style="display:none;">
+
+            ➡ Next Question
+
+        </button>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         NORMAL ASK
+    ====================================================== -->
+
+    <div class="ask-area">
+
+        <input
+                type="text"
+                id="questionInput"
+                placeholder="Ask a Java interview question..."
+                onkeydown="handleEnter(event)"
+        >
+
+
+        <button onclick="askQuestion()">
+
+            Ask
+
+        </button>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         LOADING
+    ====================================================== -->
+
+    <div
+            class="loading"
+            id="loading">
+
+        🤖 Generating answer...
+
+    </div>
+
+
+
+    <!-- =====================================================
+         HISTORY
+    ====================================================== -->
+
+    <div class="history-header">
+
+        <h2>
+
+            📚 Interview History
+
+        </h2>
+
+
+        <span
+                class="history-count"
+                id="historyCount">
+
+            0 questions
+
+        </span>
+
+    </div>
+
+
+    <div id="history"></div>
+
+
+</main>
+
+
+
+<script>
+
+
+    /* =========================================================
+       MARKED
+    ========================================================= */
+
+    marked.setOptions({
+
+        breaks: true,
+
+        gfm: true
+
+    });
+
+
+    /* =========================================================
+       STORAGE
+    ========================================================= */
+
+    const STORAGE_KEY =
+        "javaInterviewHistory";
+
+
+    /* =========================================================
+       MOCK VARIABLES
+    ========================================================= */
+
+    let mockInterviewActive = false;
+
+    let currentMockQuestion = "";
+
+
+    /* =========================================================
+       GET HISTORY
+    ========================================================= */
+
+    function getHistory() {
+
+        try {
+
+            const data =
+                localStorage.getItem(
+                    STORAGE_KEY
+                );
+
+            return data
+                ? JSON.parse(data)
+                : [];
+
+        } catch (error) {
+
+            return [];
+
+        }
+
+    }
+
+
+    /* =========================================================
+       SAVE HISTORY
+    ========================================================= */
+
+    function saveHistory(history) {
+
+        localStorage.setItem(
+
+            STORAGE_KEY,
+
+            JSON.stringify(history)
+
+        );
+
+    }
+
+
+    /* =========================================================
+       RENDER HISTORY
+    ========================================================= */
+
+    function renderHistory() {
+
+        const container =
+            document.getElementById(
+                "history"
+            );
+
+
+        const history =
+            getHistory();
+
+
+        container.innerHTML = "";
+
+
+        document.getElementById(
+            "historyCount"
+        ).textContent =
+
+            history.length === 1
+
+                ? "1 question"
+
+                : history.length + " questions";
+
+
+        if (history.length === 0) {
+
+            container.innerHTML = `
+
+                <div class="empty-history">
+
+                    <h3>No questions yet</h3>
+
+                    <p>
+                        Ask a question or start a mock interview.
+                    </p>
+
+                </div>
+
+            `;
+
+            return;
+
+        }
+
+
+        history.forEach(
+            (item, index) => {
+
+                createQuestionCard(
+                    item,
+                    index
+                );
+
+            }
+        );
+
+    }
+
+
+    /* =========================================================
+       CREATE CARD
+    ========================================================= */
+
+    function createQuestionCard(item, index) {
+
+        const container =
+            document.getElementById(
+                "history"
+            );
+
+
+        const card =
+            document.createElement(
+                "div"
+            );
+
+
+        card.className =
+            "question-card";
+
+
+        if (item.collapsed) {
+
+            card.classList.add(
+                "collapsed"
+            );
+
+        }
+
+
+        const header =
+            document.createElement(
+                "div"
+            );
+
+
+        header.className =
+            "question-header";
+
+
+        const questionArea =
+            document.createElement(
+                "div"
+            );
+
+
+        questionArea.className =
+            "question-text";
+
+
+        questionArea.innerHTML = `
+
+            Q${index + 1}.
+            ${escapeHtml(item.question)}
+
+            <div class="question-meta">
+
+                ${escapeHtml(item.category || "Core Java")}
+
+                •
+
+                ${escapeHtml(item.difficulty || "Medium")}
+
+            </div>
+
+        `;
+
+
+        const actions =
+            document.createElement(
+                "div"
+            );
+
+
+        actions.className =
+            "question-actions";
+
+
+        const deleteButton =
+            document.createElement(
+                "button"
+            );
+
+
+        deleteButton.className =
+            "delete-btn";
+
+
+        deleteButton.textContent =
+            "🗑";
+
+
+        deleteButton.onclick =
+            function(event) {
+
+                event.stopPropagation();
+
+                deleteQuestion(index);
+
+            };
+
+
+        const arrow =
+            document.createElement(
+                "span"
+            );
+
+
+        arrow.className =
+            "arrow";
+
+
+        arrow.textContent =
+            "▼";
+
+
+        actions.appendChild(
+            deleteButton
+        );
+
+
+        actions.appendChild(
+            arrow
+        );
+
+
+        header.appendChild(
+            questionArea
+        );
+
+
+        header.appendChild(
+            actions
+        );
+
+
+        const answer =
+            document.createElement(
+                "div"
+            );
+
+
+        answer.className =
+            "answer";
+
+
+        answer.innerHTML =
+            marked.parse(
+                item.answer || ""
+            );
+
+
+        addCodeHighlighting(
+            answer
+        );
+
+
+        header.onclick =
+            function() {
+
+                toggleAnswer(
+                    index,
+                    card
+                );
+
+            };
+
+
+        card.appendChild(
+            header
+        );
+
+
+        card.appendChild(
+            answer
+        );
+
+
+        container.appendChild(
+            card
+        );
+
+    }
+
+
+    /* =========================================================
+       COLLAPSE
+    ========================================================= */
+
+    function toggleAnswer(index, card) {
+
+        const history =
+            getHistory();
+
+
+        if (!history[index]) {
+
+            return;
+
+        }
+
+
+        history[index].collapsed =
+            !history[index].collapsed;
+
+
+        saveHistory(
+            history
+        );
+
+
+        card.classList.toggle(
+            "collapsed"
+        );
+
+    }
+
+
+    /* =========================================================
+       DELETE
+    ========================================================= */
+
+    function deleteQuestion(index) {
+
+        const history =
+            getHistory();
+
+
+        if (!history[index]) {
+
+            return;
+
+        }
+
+
+        if (
+            !confirm(
+                "Delete this question?"
+            )
+        ) {
+
+            return;
+
+        }
+
+
+        history.splice(
+            index,
+            1
+        );
+
+
+        saveHistory(
+            history
+        );
+
+
+        renderHistory();
+
+    }
+
+
+    /* =========================================================
+       CLEAR HISTORY
+    ========================================================= */
+
+    function clearHistory() {
+
+        const history =
+            getHistory();
+
+
+        if (history.length === 0) {
+
+            alert(
+                "History is already empty."
+            );
+
+            return;
+
+        }
+
+
+        if (
+            !confirm(
+                "Are you sure you want to delete ALL history?"
+            )
+        ) {
+
+            return;
+
+        }
+
+
+        localStorage.removeItem(
+            STORAGE_KEY
+        );
+
+
+        renderHistory();
+
+    }
+
+
+    /* =========================================================
+       NORMAL ASK
+    ========================================================= */
+
+    async function askQuestion() {
+
+        const input =
+            document.getElementById(
+                "questionInput"
+            );
+
+
+        const question =
+            input.value.trim();
+
+
+        if (!question) {
+
+            alert(
+                "Please enter a question."
+            );
+
+            return;
+
+        }
+
+
+        const category =
+            document.getElementById(
+                "category"
+            ).value;
+
+
+        const difficulty =
+            document.getElementById(
+                "difficulty"
+            ).value;
+
+
+        input.value = "";
+
+
+        document.getElementById(
+            "loading"
+        ).style.display =
+            "block";
+
+
+        const finalQuestion = `
+
+    Category: ${category}
+
+    Difficulty: ${difficulty}
+
+    You are a Java interview assistant.
+
+    Answer the following interview question.
+
+    Question:
+    ${question}
+
+    Give the answer in proper interview-ready format.
+
+    Include:
+
+    1. Definition
+    2. Key Points
+    3. How It Works
+    4. Example
+    5. Java code example where applicable
+    6. Time complexity where applicable
+    7. Interview tip
+    8. Short interview answer
+
+    Keep the answer clear and suitable for a
+    ${difficulty} level interview question.
+
+    `.trim();
+
+
+        try {
+
+            const response =
+                await fetch(
+                    "/api/interview/ask?question=" +
+                    encodeURIComponent(
+                        finalQuestion
+                    )
+                );
+
+
+            const text =
+                await response.text();
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    text
+                );
+
+            }
+
+
+            const history =
+                getHistory();
+
+
+            history.unshift({
+
+                id: Date.now(),
+
+                question: question,
+
+                answer: text,
+
+                category: category,
+
+                difficulty: difficulty,
+
+                collapsed: false,
+
+                createdAt:
+                    new Date().toISOString()
+
+            });
+
+
+            saveHistory(
+                history
+            );
+
+
+            renderHistory();
+
+
+        } catch (error) {
+
+            alert(
+                "Error: " +
+                error.message
+            );
+
+        } finally {
+
+            document.getElementById(
+                "loading"
+            ).style.display =
+                "none";
+
+        }
+
+    }
+
+
+    /* =========================================================
+       START MOCK INTERVIEW
+    ========================================================= */
+
+    async function startMockInterview() {
+
+        mockInterviewActive = true;
+
+
+        document.getElementById(
+            "mockPanel"
+        ).style.display =
+            "block";
+
+
+        document.getElementById(
+            "stopMockBtn"
+        ).style.display =
+            "block";
+
+
+        document.getElementById(
+            "evaluation"
+        ).style.display =
+            "none";
+
+
+        document.getElementById(
+            "nextQuestionBtn"
+        ).style.display =
+            "none";
+
+
+        document.getElementById(
+            "mockAnswer"
+        ).value =
+            "";
+
+
+        await generateMockQuestion();
+
+    }
+
+
+    /* =========================================================
+       GENERATE MOCK QUESTION
+    ========================================================= */
+
+    async function generateMockQuestion() {
+
+        const category =
+            document.getElementById(
+                "category"
+            ).value;
+
+
+        const difficulty =
+            document.getElementById(
+                "difficulty"
+            ).value;
+
+
+        const questionElement =
+            document.getElementById(
+                "mockQuestion"
+            );
+
+
+        questionElement.textContent =
+            "🤖 Generating interview question...";
+
+
+        try {
+
+            const response =
+                await fetch(
+
+                    "/api/interview/mock-question?category=" +
+
+                    encodeURIComponent(category) +
+
+                    "&difficulty=" +
+
+                    encodeURIComponent(difficulty)
+
+                );
+
+
+            const text =
+                await response.text();
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    text
+                );
+
+            }
+
+
+            currentMockQuestion =
+                text.trim();
+
+
+            questionElement.textContent =
+                currentMockQuestion;
+
+
+        } catch (error) {
+
+            questionElement.textContent =
+                "❌ Error: " +
+                error.message;
+
+        }
+
+    }
+
+
+    /* =========================================================
+       EVALUATE MOCK ANSWER
+    ========================================================= */
+
+    async function evaluateMockAnswer() {
+
+        const answer =
+            document.getElementById(
+                "mockAnswer"
+            ).value.trim();
+
+
+        if (!answer) {
+
+            alert(
+                "Please type your answer first."
+            );
+
+            return;
+
+        }
+
+
+        if (!currentMockQuestion) {
+
+            alert(
+                "Please generate a question first."
+            );
+
+            return;
+
+        }
+
+
+        const category =
+            document.getElementById(
+                "category"
+            ).value;
+
+
+        const difficulty =
+            document.getElementById(
+                "difficulty"
+            ).value;
+
+
+        const evaluation =
+            document.getElementById(
+                "evaluation"
+            );
+
+
+        evaluation.style.display =
+            "block";
+
+
+        evaluation.innerHTML =
+            "🤖 Evaluating your answer...";
+
+
+        try {
+
+            const response =
+                await fetch(
+                    "/api/interview/evaluate",
+                    {
+
+                        method: "POST",
+
+                        headers: {
+
+                            "Content-Type":
+                                "application/json"
+
+                        },
+
+                        body: JSON.stringify({
+
+                            question:
+                                currentMockQuestion,
+
+                            answer:
+                                answer,
+
+                            category:
+                                category,
+
+                            difficulty:
+                                difficulty
+
+                        })
+
+                    }
+                );
+
+
+            const text =
+                await response.text();
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    text
+                );
+
+            }
+
+
+            evaluation.innerHTML =
+                marked.parse(text);
+
+
+            addCodeHighlighting(
+                evaluation
+            );
+
+
+            document.getElementById(
+                "nextQuestionBtn"
+            ).style.display =
+                "inline-block";
+
+
+            /* SAVE MOCK INTERVIEW IN HISTORY */
+
+            const history =
+                getHistory();
+
+
+            history.unshift({
+
+                id: Date.now(),
+
+                question:
+                    currentMockQuestion,
+
+                answer:
+
+                    "### Your Answer\n\n" +
+
+                    answer +
+
+                    "\n\n### AI Evaluation\n\n" +
+
+                    text,
+
+                category:
+                    category,
+
+                difficulty:
+                    difficulty,
+
+                collapsed:
+                    false,
+
+                createdAt:
+                    new Date().toISOString()
+
+            });
+
+
+            saveHistory(
+                history
+            );
+
+
+            renderHistory();
+
+
+        } catch (error) {
+
+            evaluation.innerHTML = `
+
+                <div class="error">
+
+                    ❌ Error:
+
+                    ${escapeHtml(
+                        error.message
+                    )}
+
+                </div>
+
+            `;
+
+        }
+
+    }
+
+
+    /* =========================================================
+       NEXT MOCK QUESTION
+    ========================================================= */
+
+    async function nextMockQuestion() {
+
+        document.getElementById(
+            "mockAnswer"
+        ).value =
+            "";
+
+
+        document.getElementById(
+            "evaluation"
+        ).style.display =
+            "none";
+
+
+        document.getElementById(
+            "nextQuestionBtn"
+        ).style.display =
+            "none";
+
+
+        await generateMockQuestion();
+
+    }
+
+
+    /* =========================================================
+       STOP MOCK INTERVIEW
+    ========================================================= */
+
+    function stopMockInterview() {
+
+        mockInterviewActive = false;
+
+
+        document.getElementById(
+            "mockPanel"
+        ).style.display =
+            "none";
+
+
+        document.getElementById(
+            "stopMockBtn"
+        ).style.display =
+            "none";
+
+
+        currentMockQuestion = "";
+
+    }
+
+
+    /* =========================================================
+       ENTER KEY
+    ========================================================= */
+
+    function handleEnter(event) {
+
+        if (
+            event.key === "Enter"
+        ) {
+
+            askQuestion();
+
+        }
+
+    }
+
+
+    /* =========================================================
+       CODE HIGHLIGHTING
+    ========================================================= */
+
+    function addCodeHighlighting(container) {
+
+        container
+            .querySelectorAll(
+                "pre code"
+            )
+            .forEach(
+                (block) => {
+
+                    hljs.highlightElement(
+                        block
+                    );
+
+
+                    const pre =
+                        block.parentNode;
+
+
+                    const wrapper =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    wrapper.className =
+                        "code-wrapper";
+
+
+                    pre.parentNode.insertBefore(
+                        wrapper,
+                        pre
+                    );
+
+
+                    wrapper.appendChild(
+                        pre
+                    );
+
+
+                    const button =
+                        document.createElement(
+                            "button"
+                        );
+
+
+                    button.className =
+                        "copy-btn";
+
+
+                    button.textContent =
+                        "Copy";
+
+
+                    button.onclick =
+                        async function() {
+
+                            try {
+
+                                await navigator
+                                    .clipboard
+                                    .writeText(
+                                        block.innerText
+                                    );
+
+
+                                button.textContent =
+                                    "Copied!";
+
+
+                                setTimeout(
+                                    () => {
+
+                                        button.textContent =
+                                            "Copy";
+
+                                    },
+                                    1500
+                                );
+
+
+                            } catch (error) {
+
+                                button.textContent =
+                                    "Failed";
+
+                            }
+
+                        };
+
+
+                    wrapper.appendChild(
+                        button
+                    );
+
+                }
+            );
+
+    }
+
+
+    /* =========================================================
+       ESCAPE HTML
+    ========================================================= */
+
+    function escapeHtml(text) {
+
+        const div =
+            document.createElement(
+                "div"
+            );
+
+
+        div.textContent =
+            text;
+
+
+        return div.innerHTML;
+
+    }
+
+
+    /* =========================================================
+       PAGE LOAD
+    ========================================================= */
+
+    window.addEventListener(
+        "DOMContentLoaded",
+        function() {
+
+            renderHistory();
+
+        }
+    );
+
+</script>
+
+
+</body>
+
+</html>
