@@ -9,23 +9,11 @@
           content="width=device-width, initial-scale=1.0">
 
     <title>Java Interview Assistant</title>
-
-
-    <!-- Markdown -->
-
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-
-
-    <!-- Highlight.js -->
-
     <link rel="stylesheet"
           href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github-dark.min.css">
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/java.min.js"></script>
-
-
     <style>
 
         * {
@@ -97,6 +85,29 @@
 
             background: #b91c1c;
         }
+        .header-buttons {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.header-buttons form {
+    margin: 0;
+}
+
+.logout-btn {
+    border: none;
+    background: #172033;
+    color: white;
+    padding: 11px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.logout-btn:hover {
+    background: #000000;
+}
 
 
         /* ================= CONTAINER ================= */
@@ -798,14 +809,23 @@
     </div>
 
 
-    <button
-            class="clear-btn"
-            onclick="clearHistory()">
+    <div class="header-buttons">
 
-        🗑 Clear History
+        <button
+                class="clear-btn"
+                onclick="clearHistory()">
+            🗑 Clear History
+        </button>
 
-    </button>
+        <form action="/logout" method="post">
+            <button
+                    type="submit"
+                    class="logout-btn">
+                🚪 Logout
+            </button>
+        </form>
 
+    </div>
 </header>
 
 

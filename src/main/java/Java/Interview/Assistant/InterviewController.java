@@ -15,22 +15,12 @@ public class InterviewController {
         this.claudeService = claudeService;
     }
 
-    // =========================================================
-    // NORMAL QUESTION
-    // =========================================================
-
     @GetMapping("/ask")
     public String ask(
             @RequestParam String question) {
 
         return claudeService.askClaude(question);
     }
-
-
-    // =========================================================
-    // GENERATE MOCK INTERVIEW QUESTION
-    // =========================================================
-
     @GetMapping("/mock-question")
     public String generateMockQuestion(
             @RequestParam String category,
@@ -59,12 +49,6 @@ public class InterviewController {
 
         return claudeService.askClaudeRaw(prompt);
     }
-
-
-    // =========================================================
-    // EVALUATE MOCK INTERVIEW ANSWER
-    // =========================================================
-
     @PostMapping("/evaluate")
     public String evaluateAnswer(
             @RequestBody Map<String, String> request) {

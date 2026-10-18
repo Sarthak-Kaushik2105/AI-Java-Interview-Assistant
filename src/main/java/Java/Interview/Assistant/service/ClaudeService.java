@@ -16,11 +16,6 @@ public class ClaudeService {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-
-    // =========================================================
-    // NORMAL INTERVIEW ANSWER
-    // =========================================================
-
     public String askClaude(String question) {
 
         String apiKey = System.getenv("GEMINI_API_KEY");
@@ -77,13 +72,6 @@ public class ClaudeService {
 
         return sendToGemini(prompt, apiKey);
     }
-
-
-    // =========================================================
-    // RAW AI RESPONSE
-    // Used for mock interview questions
-    // =========================================================
-
     public String askClaudeRaw(String prompt) {
 
         String apiKey = System.getenv("GEMINI_API_KEY");
@@ -94,11 +82,6 @@ public class ClaudeService {
 
         return sendToGemini(prompt, apiKey);
     }
-
-
-    // =========================================================
-    // SEND REQUEST TO GEMINI
-    // =========================================================
 
     private String sendToGemini(String prompt, String apiKey) {
 
@@ -148,12 +131,6 @@ public class ClaudeService {
 
         }
     }
-
-
-    // =========================================================
-    // ESCAPE JSON
-    // =========================================================
-
     private String escapeJson(String text) {
 
         return text
@@ -194,11 +171,6 @@ public class ClaudeService {
                     + e.getMessage();
         }
     }
-
-
-    // =========================================================
-    // FIND TEXT RECURSIVELY
-    // =========================================================
 
     private String findText(JsonNode node) {
 
