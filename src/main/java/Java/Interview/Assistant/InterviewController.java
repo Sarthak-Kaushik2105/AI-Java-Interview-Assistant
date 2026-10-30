@@ -129,9 +129,13 @@ public class InterviewController {
                 """.formatted(category, difficulty, focusInstruction);
     }
 
-    private boolean isAiError(String response) {
-        return response == null || response.startsWith("Error:")
-                || response.startsWith("Error connecting to Gemini:")
-                || response.startsWith("Gemini API Error:");
+    static boolean isAiError(String response) {
+        if (response == null || response.isBlank()) return true;
+        String value = response.trim();
+        return value.startsWith("Error:")
+                || value.startsWith("Error connecting to Gemini:")
+                || value.startsWith("Error parsing Gemini response:")
+                || value.startsWith("Gemini API Error:")
+                || value.startsWith("No text response received from Gemini.");
     }
 }

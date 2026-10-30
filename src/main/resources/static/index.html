@@ -1208,9 +1208,16 @@
                     STORAGE_KEY
                 );
 
-            return data
-                ? JSON.parse(data)
-                : [];
+            if (!data) return [];
+            const parsed = JSON.parse(data);
+            if (!Array.isArray(parsed)) return [];
+            return parsed
+                .filter(item => item !== null && typeof item === "object" && !Array.isArray(item))
+                .map(item => ({
+                    ...item,
+                    question: typeof item.question === "string" ? item.question : "",
+                    answer: typeof item.answer === "string" ? item.answer : ""
+                }));
 
         } catch (error) {
 
@@ -1454,10 +1461,7 @@
             "answer";
 
 
-        answer.innerHTML =
-            marked.parse(
-                item.answer || ""
-            );
+        renderMarkdownSafely(answer, item.answer || "");
 
 
         addCodeHighlighting(
@@ -1493,14 +1497,15 @@
     }
 
     function isMockHistoryItem(item) {
-        return item.type === "mock" || item.evaluation != null ||
-            (typeof item.answer === "string" && item.answer.includes("### Your Answer\n\n"));
+        return Boolean(item) && (item.type === "mock" || item.evaluation != null ||
+            (typeof item.answer === "string" && item.answer.includes("### Your Answer\n\n")));
     }
 
     function renderPerformanceSummary(history) {
         const container = document.getElementById("performanceSummary");
         const mockItems = history.filter(isMockHistoryItem);
-        const scored = mockItems.filter(item => Number.isFinite(Number(item.score)))
+        const scored = mockItems.filter(item => item.score !== null && item.score !== "" &&
+            Number.isFinite(Number(item.score)) && Number(item.score) >= 0 && Number(item.score) <= 10)
             .map(item => ({ ...item, numericScore: Number(item.score) }));
         const average = scored.length
             ? (scored.reduce((sum, item) => sum + item.numericScore, 0) / scored.length).toFixed(1) + "/10"
@@ -1902,7 +1907,7 @@
 
             if (!response.ok) {
                 const message = await response.text();
-                throw new Error(message || "Question generation failed.");
+                throw new Error(extractApiErrorMessage(message) || "Question generation failed.");
             }
 
             const selection = await response.json();
@@ -2028,7 +2033,7 @@
 
             if (!response.ok) {
                 const message = await response.text();
-                throw new Error(message || "Evaluation failed.");
+                throw new Error(extractApiErrorMessage(message) || "Evaluation failed.");
             }
 
             const result = await response.json();
@@ -2177,6 +2182,67 @@
             result.referenceAnswer || "Not provided"
         ];
         return lines.join("\n\n");
+    }
+
+    function renderMarkdownSafely(container, markdown) {
+        const parsed = new DOMParser().parseFromString(marked.parse(markdown), "text/html");
+        const fragment = document.createDocumentFragment();
+        Array.from(parsed.body.childNodes).forEach(node => appendSafeMarkdownNode(node, fragment));
+        container.replaceChildren(fragment);
+    }
+
+    function appendSafeMarkdownNode(source, target) {
+        if (source.nodeType === Node.TEXT_NODE) {
+            target.appendChild(document.createTextNode(source.textContent || ""));
+            return;
+        }
+        if (source.nodeType !== Node.ELEMENT_NODE) return;
+
+        const allowedTags = new Set([
+            "P", "BR", "HR", "H1", "H2", "H3", "H4", "H5", "H6",
+            "BLOCKQUOTE", "UL", "OL", "LI", "PRE", "CODE", "EM", "STRONG",
+            "DEL", "TABLE", "THEAD", "TBODY", "TFOOT", "TR", "TH", "TD", "A"
+        ]);
+        if (!allowedTags.has(source.tagName)) {
+            Array.from(source.childNodes).forEach(node => appendSafeMarkdownNode(node, target));
+            return;
+        }
+
+        const safeElement = document.createElement(source.tagName.toLowerCase());
+        if (source.tagName === "A") {
+            const href = source.getAttribute("href");
+            if (href && isSafeMarkdownLink(href)) safeElement.setAttribute("href", href);
+            const title = source.getAttribute("title");
+            if (title) safeElement.setAttribute("title", title);
+        }
+        if (source.tagName === "CODE") {
+            const safeClasses = (source.getAttribute("class") || "").split(/\s+/)
+                .filter(value => /^language-[a-z0-9_-]+$/i.test(value));
+            if (safeClasses.length) safeElement.setAttribute("class", safeClasses.join(" "));
+        }
+        Array.from(source.childNodes).forEach(node => appendSafeMarkdownNode(node, safeElement));
+        target.appendChild(safeElement);
+    }
+
+    function isSafeMarkdownLink(href) {
+        const value = href.trim();
+        if (!value || value.startsWith("//")) return false;
+        try {
+            const url = new URL(value, document.baseURI);
+            return ["http:", "https:", "mailto:"].includes(url.protocol);
+        } catch (error) {
+            return false;
+        }
+    }
+
+    function extractApiErrorMessage(responseBody) {
+        if (!responseBody) return "";
+        try {
+            const problem = JSON.parse(responseBody);
+            return problem.detail || problem.message || responseBody;
+        } catch (error) {
+            return responseBody;
+        }
     }
 
 
