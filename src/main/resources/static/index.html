@@ -453,6 +453,62 @@
             line-height: 1.7;
         }
 
+        .adaptive-reason {
+            margin: -5px 0 18px;
+            padding: 11px 14px;
+            border-radius: 9px;
+            background: #f3e8ff;
+            color: #5b21b6;
+            font-size: 14px;
+        }
+
+        .evaluation-score {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            margin-bottom: 18px;
+            color: #14532d;
+        }
+
+        .evaluation-score strong { font-size: 30px; }
+        .evaluation-section { margin: 16px 0; }
+        .evaluation-section h3 { margin: 0 0 6px; font-size: 16px; }
+        .evaluation-section p { margin: 0; white-space: pre-wrap; }
+        .evaluation-section ul { margin: 5px 0 0; padding-left: 22px; }
+        .reference-answer {
+            white-space: pre-wrap;
+            background: white;
+            padding: 14px;
+            border-radius: 8px;
+        }
+
+        .performance-panel {
+            background: white;
+            border-radius: 14px;
+            padding: 20px;
+            margin: 24px 0;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.06);
+        }
+        .performance-panel h2 { margin: 0 0 14px; font-size: 20px; }
+        .performance-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+        }
+        .performance-metric {
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 14px;
+            color: #667085;
+            font-size: 13px;
+        }
+        .performance-metric strong {
+            display: block;
+            margin-top: 5px;
+            color: #172033;
+            font-size: 19px;
+        }
+
 
         .next-btn {
 
@@ -565,6 +621,17 @@
             color: #667085;
 
             margin-top: 6px;
+        }
+
+        .score-badge {
+            display: inline-block;
+            margin-left: 8px;
+            padding: 2px 8px;
+            border-radius: 999px;
+            background: #dcfce7;
+            color: #166534;
+            font-size: 12px;
+            font-weight: bold;
         }
 
 
@@ -977,6 +1044,8 @@
 
         </div>
 
+        <div class="adaptive-reason" id="adaptiveReason" style="display:none"></div>
+
 
         <textarea
                 id="mockAnswer"
@@ -1058,6 +1127,11 @@
          HISTORY
     ====================================================== -->
 
+    <section class="performance-panel" aria-label="Interview performance">
+        <h2>📊 Mock Interview Performance</h2>
+        <div class="performance-grid" id="performanceSummary"></div>
+    </section>
+
     <div class="history-header">
 
         <h2>
@@ -1116,6 +1190,9 @@
     let mockInterviewActive = false;
 
     let currentMockQuestion = "";
+    let currentMockDifficulty = "Medium";
+    let currentMockTopic = "";
+    let latestEvaluation = null;
 
 
     /* =========================================================
@@ -1189,6 +1266,8 @@
                 ? "1 question"
 
                 : history.length + " questions";
+
+        renderPerformanceSummary(history);
 
 
         if (history.length === 0) {
@@ -1289,6 +1368,8 @@
                 •
 
                 ${escapeHtml(item.difficulty || "Medium")}
+
+                ${Number.isFinite(Number(item.score)) ? `<span class="score-badge">${Number(item.score).toFixed(1)}/10</span>` : ""}
 
             </div>
 
@@ -1409,6 +1490,54 @@
             card
         );
 
+    }
+
+    function isMockHistoryItem(item) {
+        return item.type === "mock" || item.evaluation != null ||
+            (typeof item.answer === "string" && item.answer.includes("### Your Answer\n\n"));
+    }
+
+    function renderPerformanceSummary(history) {
+        const container = document.getElementById("performanceSummary");
+        const mockItems = history.filter(isMockHistoryItem);
+        const scored = mockItems.filter(item => Number.isFinite(Number(item.score)))
+            .map(item => ({ ...item, numericScore: Number(item.score) }));
+        const average = scored.length
+            ? (scored.reduce((sum, item) => sum + item.numericScore, 0) / scored.length).toFixed(1) + "/10"
+            : "No scores yet";
+        const byTopic = new Map();
+        scored.forEach(item => {
+            const topic = item.topic || item.category || "Uncategorized";
+            const values = byTopic.get(topic) || [];
+            values.push(item.numericScore);
+            byTopic.set(topic, values);
+        });
+        const topicAverages = [...byTopic.entries()].map(([topic, values]) => ({
+            topic,
+            average: values.reduce((sum, value) => sum + value, 0) / values.length
+        }));
+        const strongest = topicAverages.length >= 2
+            ? topicAverages.reduce((a, b) => a.average >= b.average ? a : b).topic
+            : "Need scores in 2+ topics";
+        const weakest = topicAverages.length >= 2
+            ? topicAverages.reduce((a, b) => a.average <= b.average ? a : b).topic
+            : "Need scores in 2+ topics";
+        const metrics = [
+            ["Completed mock questions", String(mockItems.length)],
+            ["Average score", average],
+            ["Strongest topic", strongest],
+            ["Weakest topic", weakest]
+        ];
+        container.replaceChildren(...metrics.map(([label, value]) => {
+            const card = document.createElement("div");
+            card.className = "performance-metric";
+            const title = document.createElement("span");
+            title.textContent = label;
+            const result = document.createElement("strong");
+            result.textContent = value;
+            card.append(title, result);
+            return card;
+        }));
     }
 
 
@@ -1693,6 +1822,10 @@
     async function startMockInterview() {
 
         mockInterviewActive = true;
+        currentMockDifficulty = document.getElementById("difficulty").value;
+        latestEvaluation = null;
+        currentMockTopic = document.getElementById("category").value;
+        currentMockQuestion = "";
 
 
         document.getElementById(
@@ -1734,17 +1867,13 @@
        GENERATE MOCK QUESTION
     ========================================================= */
 
-    async function generateMockQuestion() {
+    async function generateMockQuestion(previousScore = null, weakConcepts = []) {
+
+        currentMockQuestion = "";
 
         const category =
             document.getElementById(
                 "category"
-            ).value;
-
-
-        const difficulty =
-            document.getElementById(
-                "difficulty"
             ).value;
 
 
@@ -1760,39 +1889,37 @@
 
         try {
 
-            const response =
-                await fetch(
-
-                    "/api/interview/mock-question?category=" +
-
-                    encodeURIComponent(category) +
-
-                    "&difficulty=" +
-
-                    encodeURIComponent(difficulty)
-
-                );
-
-
-            const text =
-                await response.text();
+            const params = new URLSearchParams({
+                category,
+                difficulty: currentMockDifficulty
+            });
+            if (previousScore !== null && previousScore !== undefined && Number.isFinite(Number(previousScore))) {
+                params.set("previousScore", String(previousScore));
+            }
+            weakConcepts.forEach(concept => params.append("weakConcepts", concept));
+            const response = await fetch("/api/interview/adaptive-question?" + params.toString());
 
 
             if (!response.ok) {
-
-                throw new Error(
-                    text
-                );
-
+                const message = await response.text();
+                throw new Error(message || "Question generation failed.");
             }
 
-
-            currentMockQuestion =
-                text.trim();
+            const selection = await response.json();
+            if (!selection || typeof selection.question !== "string" || !selection.question.trim()) {
+                throw new Error("The AI returned an invalid question.");
+            }
+            currentMockQuestion = selection.question.trim();
+            currentMockDifficulty = selection.difficulty || currentMockDifficulty;
+            currentMockTopic = selection.topic || category;
+            document.getElementById("difficulty").value = currentMockDifficulty;
 
 
             questionElement.textContent =
                 currentMockQuestion;
+            const reason = document.getElementById("adaptiveReason");
+            reason.textContent = `${selection.selectionReason} Next focus: ${currentMockTopic} (${currentMockDifficulty}).`;
+            reason.style.display = "block";
 
 
         } catch (error) {
@@ -1800,6 +1927,7 @@
             questionElement.textContent =
                 "❌ Error: " +
                 error.message;
+            document.getElementById("adaptiveReason").style.display = "none";
 
         }
 
@@ -1846,10 +1974,7 @@
             ).value;
 
 
-        const difficulty =
-            document.getElementById(
-                "difficulty"
-            ).value;
+        const difficulty = currentMockDifficulty;
 
 
         const evaluation =
@@ -1862,8 +1987,7 @@
             "block";
 
 
-        evaluation.innerHTML =
-            "🤖 Evaluating your answer...";
+            evaluation.textContent = "🤖 Evaluating your answer...";
 
 
         try {
@@ -1902,26 +2026,17 @@
                 );
 
 
-            const text =
-                await response.text();
-
-
             if (!response.ok) {
-
-                throw new Error(
-                    text
-                );
-
+                const message = await response.text();
+                throw new Error(message || "Evaluation failed.");
             }
 
-
-            evaluation.innerHTML =
-                marked.parse(text);
-
-
-            addCodeHighlighting(
-                evaluation
-            );
+            const result = await response.json();
+            if (!result || !Number.isFinite(Number(result.overallScore))) {
+                throw new Error("The evaluation response was incomplete.");
+            }
+            latestEvaluation = result;
+            renderStructuredEvaluation(evaluation, result);
 
 
             document.getElementById(
@@ -1950,8 +2065,15 @@
                     answer +
 
                     "\n\n### AI Evaluation\n\n" +
+                    evaluationToHistoryText(result),
 
-                    text,
+                type: "mock",
+
+                score: Number(result.overallScore),
+
+                topic: currentMockTopic || category,
+
+                evaluation: result,
 
                 category:
                     category,
@@ -1978,22 +2100,83 @@
 
         } catch (error) {
 
-            evaluation.innerHTML = `
-
-                <div class="error">
-
-                    ❌ Error:
-
-                    ${escapeHtml(
-                        error.message
-                    )}
-
-                </div>
-
-            `;
+            evaluation.textContent = "❌ Error: " + error.message;
 
         }
 
+    }
+
+    function renderStructuredEvaluation(container, result) {
+        container.replaceChildren();
+        const score = document.createElement("div");
+        score.className = "evaluation-score";
+        const scoreValue = document.createElement("strong");
+        scoreValue.textContent = `${Number(result.overallScore).toFixed(1)}/10`;
+        const verdict = document.createElement("span");
+        verdict.textContent = result.interviewVerdict || "Evaluation complete";
+        score.append(scoreValue, verdict);
+        container.appendChild(score);
+
+        addEvaluationTextSection(container, "Technical correctness", result.technicalCorrectness);
+        addEvaluationTextSection(container, "Conceptual understanding", result.conceptualUnderstanding);
+        addEvaluationListSection(container, "Missing or incorrect concepts", result.missingOrIncorrectConcepts);
+        addEvaluationListSection(container, "Strengths", result.strengths);
+        addEvaluationListSection(container, "Areas for improvement", result.areasForImprovement);
+        addEvaluationTextSection(container, "Correct reference answer", result.referenceAnswer, true);
+        addEvaluationTextSection(container, "Interview verdict", result.interviewVerdict);
+    }
+
+    function addEvaluationTextSection(container, heading, text, reference = false) {
+        const section = document.createElement("section");
+        section.className = "evaluation-section";
+        const title = document.createElement("h3");
+        title.textContent = heading;
+        const body = document.createElement("p");
+        body.textContent = typeof text === "string" && text.trim() ? text : "Not provided.";
+        if (reference) body.className = "reference-answer";
+        section.append(title, body);
+        container.appendChild(section);
+    }
+
+    function addEvaluationListSection(container, heading, values) {
+        const section = document.createElement("section");
+        section.className = "evaluation-section";
+        const title = document.createElement("h3");
+        title.textContent = heading;
+        section.appendChild(title);
+        const items = Array.isArray(values) ? values.filter(value => typeof value === "string" && value.trim()) : [];
+        const body = document.createElement("p");
+        if (items.length === 0) {
+            body.textContent = "None identified.";
+            section.appendChild(body);
+        } else {
+            const list = document.createElement("ul");
+            items.forEach(value => {
+                const item = document.createElement("li");
+                item.textContent = value;
+                list.appendChild(item);
+            });
+            section.appendChild(list);
+        }
+        container.appendChild(section);
+    }
+
+    function evaluationToHistoryText(result) {
+        const lines = [
+            `**Score:** ${Number(result.overallScore).toFixed(1)}/10`,
+            `**Verdict:** ${result.interviewVerdict || "Not provided"}`,
+            `**Technical correctness:** ${result.technicalCorrectness || "Not provided"}`,
+            `**Conceptual understanding:** ${result.conceptualUnderstanding || "Not provided"}`,
+            "**Missing or incorrect concepts:**",
+            ...(result.missingOrIncorrectConcepts || []).map(value => `- ${value}`),
+            "**Strengths:**",
+            ...(result.strengths || []).map(value => `- ${value}`),
+            "**Areas for improvement:**",
+            ...(result.areasForImprovement || []).map(value => `- ${value}`),
+            "**Correct reference answer:**",
+            result.referenceAnswer || "Not provided"
+        ];
+        return lines.join("\n\n");
     }
 
 
@@ -2021,7 +2204,14 @@
             "none";
 
 
-        await generateMockQuestion();
+        const weakConcepts = latestEvaluation
+            ? [...(latestEvaluation.missingOrIncorrectConcepts || []), ...(latestEvaluation.areasForImprovement || [])]
+                .filter(value => typeof value === "string" && value.trim())
+                .filter((value, index, values) => values.indexOf(value) === index)
+                .slice(0, 4)
+            : [];
+        const previousScore = latestEvaluation ? Number(latestEvaluation.overallScore) : null;
+        await generateMockQuestion(previousScore, weakConcepts);
 
     }
 
