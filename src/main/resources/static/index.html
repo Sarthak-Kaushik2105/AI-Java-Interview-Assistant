@@ -2271,7 +2271,7 @@
 
 
         const weakConcepts = latestEvaluation
-            ? [...(latestEvaluation.missingOrIncorrectConcepts || []), ...(latestEvaluation.areasForImprovement || [])]
+            ? [...(latestEvaluation.missingOrIncorrectConcepts || [])]
                 .filter(value => typeof value === "string" && value.trim())
                 .filter((value, index, values) => values.indexOf(value) === index)
                 .slice(0, 4)

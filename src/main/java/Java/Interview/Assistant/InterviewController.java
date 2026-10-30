@@ -5,6 +5,7 @@ import Java.Interview.Assistant.model.AdaptiveQuestion;
 import Java.Interview.Assistant.model.EvaluationResult;
 import Java.Interview.Assistant.service.AdaptiveDifficultyService;
 import Java.Interview.Assistant.service.EvaluationParser;
+import Java.Interview.Assistant.service.GeminiApiException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.server.ResponseStatusException;
@@ -53,8 +54,14 @@ public class InterviewController {
 
         var decision = adaptiveDifficultyService.decide(
                 difficulty, previousScore, weakConcepts, category);
-        String generated = claudeService.askClaudeRaw(
-                mockQuestionPrompt(category, decision.difficulty(), decision.topic()));
+        String generated;
+        try {
+            generated = claudeService.askClaudeRawOrThrow(
+                    mockQuestionPrompt(category, decision.difficulty(), decision.topic()));
+        } catch (GeminiApiException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY,
+                    "Gemini could not generate the next question. Please retry.");
+        }
         if (isAiError(generated)) {
             throw new ResponseStatusException(HttpStatus.BAD_GATEWAY,
                     "The AI question service is unavailable. Please try again.");
@@ -95,7 +102,7 @@ public class InterviewController {
                   "overallScore": number from 0 to 10,
                   "technicalCorrectness": "brief assessment of correctness",
                   "conceptualUnderstanding": "brief assessment of understanding",
-                  "missingOrIncorrectConcepts": ["concept or mistake"],
+                  "missingOrIncorrectConcepts": ["short topic or concept label, not an improvement suggestion"],
                   "strengths": ["strength"],
                   "areasForImprovement": ["actionable improvement"],
                   "referenceAnswer": "technically accurate interview-ready answer",
